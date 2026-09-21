@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stephen Nnaji's Website</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #eef5ff;
+      color: #1f2937;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 40px 20px;
+    }
+
+    main {
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    img {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 12px;
+    }
+
+    button,
+    input {
+      margin: 10px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+
+    button {
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    input {
+      border: 1px solid #94a3b8;
+    }
+
+    ul {
+      max-width: 400px;
+      margin: 10px auto 30px;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 8px 0;
+      padding: 8px 12px;
+      background: white;
+      border-radius: 8px;
+    }
+
+    li span {
+      flex: 1;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    li button {
+      margin: 0;
+      padding: 8px 12px;
+      background: #dc2626;
+    }
+
+    footer {
+      padding: 20px;
+      background: #dbeafe;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1 id="main-heading">Welcome to Stephen Nnaji's Website</h1>
+    <p>I am learning how to code websites!</p>
+  </header>
+
+  <main>
+    <h2>About Me</h2>
+    <p>
+      Hello! My name is Stephen Nnaji. I am 26 years old and I live in
+      Plymouth. I am learning how to code and build websites.
+    </p>
+
+    <img
+      src="https://placehold.co/700x350/93c5fd/1e3a8a?text=Stephen+Nnaji"
+      alt="Stephen Nnaji's website banner"
+    >
+
+    <h2>My Goal</h2>
+    <p>My goal is to learn HTML, CSS, and JavaScript.</p>
+
+    <button onclick="changeColour()">Change colour</button>
+    <button onclick="changeHeading()">Change heading</button>
+    <p id="message"></p>
+
+    <h2>Greeting Box</h2>
+    <input id="name-input" placeholder="Type your name">
+    <button onclick="greetUser()">Say hello</button>
+    <p id="greeting"></p>
+
+    <h2>My Task List</h2>
+    <p>Click a task to complete it. Use Delete to remove it.</p>
+
+    <input id="task-input" placeholder="Type a task">
+    <button onclick="addTask()">Add task</button>
+    <button onclick="clearTasks()">Clear all tasks</button>
+
+    <ul id="task-list"></ul>
+  </main>
+
+  <footer>
+    <p>Made by Stephen Nnaji in Plymouth ✨</p>
+  </footer>
+
+  <script>
+    let isGreen = false;
+    let originalHeading = true;
+    let tasks = [];
+
+    try {
+      tasks = JSON.parse(localStorage.getItem("stephenTasks")) || [];
+    } catch {
+      tasks = [];
+    }
+
+    function changeColour() {
+      if (isGreen) {
+        document.body.style.background = "#eef5ff";
+        document.getElementById("message").textContent =
+          "The background is now blue!";
+      } else {
+        document.body.style.background = "#dcfce7";
+        document.getElementById("message").textContent =
+          "The background is now green!";
+      }
+
+      isGreen = !isGreen;
+    }
+
+    function changeHeading() {
+      const heading = document.getElementById("main-heading");
+
+      if (originalHeading) {
+        heading.textContent = "Stephen Nnaji is learning JavaScript!";
+      } else {
+        heading.textContent = "Welcome to Stephen Nnaji's Website";
+      }
+
+      originalHeading = !originalHeading;
+    }
+
+    function greetUser() {
+      const name = document.getElementById("name-input").value.trim();
+      const greeting = document.getElementById("greeting");
+
+      if (name === "") {
+        greeting.textContent = "Please type your name first.";
+      } else {
+        greeting.textContent = "Hello, " + name + "!";
+      }
+    }
+
+    function saveTasks() {
+      localStorage.setItem("stephenTasks", JSON.stringify(tasks));
+    }
+
+    function showTasks() {
+      const taskList = document.getElementById("task-list");
+      taskList.innerHTML = "";
+
+      tasks.forEach(function (task, index) {
+        const item = document.createElement("li");
+        const taskName = document.createElement("span");
+        const deleteButton = document.createElement("button");
+
+        taskName.textContent = task.text;
+        deleteButton.textContent = "Delete";
+
+        if (task.completed) {
+          taskName.style.textDecoration = "line-through";
+          taskName.style.color = "gray";
+        }
+
+        taskName.addEventListener("click", function () {
+          tasks[index].completed = !tasks[index].completed;
+          saveTasks();
+          showTasks();
+        });
+
+        deleteButton.addEventListener("click", function () {
+          tasks.splice(index, 1);
+          saveTasks();
+          showTasks();
+        });
+
+        item.appendChild(taskName);
+        item.appendChild(deleteButton);
+        taskList.appendChild(item);
+      });
+    }
+
+    function addTask() {
+      const taskInput = document.getElementById("task-input");
+      const taskText = taskInput.value.trim();
+
+      if (taskText === "") {
+        return;
+      }
+
+      tasks.push({
+        text: taskText,
+        completed: false
+      });
+
+      saveTasks();
+      showTasks();
+
+      taskInput.value = "";
+      taskInput.focus();
+    }
+
+    function clearTasks() {
+      tasks = [];
+      saveTasks();
+      showTasks();
+    }
+
+    document.getElementById("name-input").addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        greetUser();
+      }
+    });
+
+    document.getElementById("task-input").addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        addTask();
+      }
+    });
+
+    showTasks();
+  </script>
+</body>
+</html>
